@@ -1,0 +1,4 @@
+1. When one opens a file, the b flag just represents binary. Binary is just a way how files are stores.
+For most operating systems, it doesn't matter but for operating systems such as windows it matters as they 
+treat binary files.
+
