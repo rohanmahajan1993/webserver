@@ -6,14 +6,20 @@ import pickle
 
 
 class Server_Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-    def init_dicts():
-        for filename in filenames:
+    filenames = [
+        "tester1.pkl", "tester2.pkl", "tester3.pkl", "tester4.pkl",
+        "tester5.pkl"
+    ]
+
+    @classmethod
+    def init_dicts(cls):
+        for filename in Server_Handler.filenames:
             pkl_file = open(filename, 'wb')
             my_dict = {}
             pickle.dump(my_dict, pkl_file)
             pkl_file.close()
 
-    def writeFileName(filename, key, value):
+    def writeFileName(self, filename, key, value):
         pkl_file = open(filename, 'r+')
         my_dict = pickle.load(pkl_file)
         my_dict[key] = value
@@ -23,7 +29,7 @@ class Server_Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         pickle.dump(my_dict, pkl_file)
         pkl_file.close()
 
-    def findKeyValue(filename, key):
+    def findKeyValue(self, filename, key):
         pkl_file = open(filename, 'rb')
         my_dict = pickle.load(pkl_file)
         print key, my_dict
@@ -33,8 +39,9 @@ class Server_Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             return "Key not found"
         pkl_file.close()
 
-        def get_file_name(key):
-            return filenames[hash(key) % len(filenames)]
+    def get_file_name(self, key):
+        return Server_Handler.filenames[hash(key) %
+                                        len(Server_Handler.filenames)]
 
     def do_GET(self):
         self.send_response(200)
@@ -45,19 +52,17 @@ class Server_Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             values = path[5:].split("=")
             key = values[0]
             value = values[1]
-            filename = get_file_name(key)
-            writeFileName(filename, key, value)
+            filename = self.get_file_name(key)
+            self.writeFileName(filename, key, value)
         if path.startswith("/get?key="):
             key = path[9:]
-            filename = get_file_name(key)
-            value = findKeyValue(filename, key)
+            filename = self.get_file_name(key)
+            value = self.findKeyValue(filename, key)
             self.wfile.write(value)
 
 
-filenames = [
-    "tester1.pkl", "tester2.pkl", "tester3.pkl", "tester4.pkl", "tester5.pkl"
-]
 handler = Server_Handler
+handler.init_dicts()
 httpd = SocketServer.TCPServer(("", PORT), handler)
 
 print "serving at port", PORT
