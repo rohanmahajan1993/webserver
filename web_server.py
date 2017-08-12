@@ -25,14 +25,12 @@ class Server_Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         my_dict[key] = value
         pkl_file.close()
         pkl_file = open(filename, 'wb')
-        print "my dict is", my_dict
         pickle.dump(my_dict, pkl_file)
         pkl_file.close()
 
     def findKeyValue(self, filename, key):
         pkl_file = open(filename, 'rb')
         my_dict = pickle.load(pkl_file)
-        print key, my_dict
         if key in my_dict:
             return my_dict[key]
         else:
@@ -60,10 +58,8 @@ class Server_Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             value = self.findKeyValue(filename, key)
             self.wfile.write(value)
 
-
-handler = Server_Handler
-handler.init_dicts()
-httpd = SocketServer.TCPServer(("", PORT), handler)
-
-print "serving at port", PORT
-httpd.serve_forever()
+def start():
+  handler = Server_Handler
+  handler.init_dicts()
+  httpd = SocketServer.TCPServer(("", PORT), handler)
+  httpd.serve_forever()
