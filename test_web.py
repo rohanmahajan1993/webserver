@@ -20,5 +20,4 @@ def test_web_client():
     assert(value == "b") 
     value = web_client.get_key_value("key2")
     assert(value == "a") 
-    os.kill(new_pid, signal.SIGTERM)
-test_web_client()
+    os.kill(new_pid, signal.SIGKILL)
